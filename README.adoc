@@ -1,0 +1,97 @@
+# Instaclustr Minotaur
+
+image:https://img.shields.io/maven-central/v/com.instaclustr/minotaur.svg?label=Maven%20Central[link=https://search.maven.org/search?q=g:%22com.instaclustr%22%20AND%20a:%22minotaur%22]
+image:https://circleci.com/gh/instaclustr/instaclustr-minotaur.svg?style=svg["Instaclustr",link="https://circleci.com/gh/instaclustr/instaclustr-minotaur"]
+
+Minotaur is a command line tool for consistent rebuild of a Cassandra cluster.
+
+## Building
+
+[source=bash]
+----
+$ mvn clean install
+----
+
+Artifacts are in `target`.
+
+We are providing:
+
+* Minotaur jar
+* rpm package
+* deb package
+
+## Example
+
+[source=bash]
+----
+# here we suppose you have installed e.g. RPM
+$ minotaur \
+    --jmx-keystore=/path/to/keystore.p12 \
+    --jmx-keystore-password=cassandra \
+    --jmx-password=cassandra \
+    --jmx-truststore=/path/to/truststore.jks \
+    --jmx-truststore-password=cassandra \
+    --jmx-user=cassandra \
+    --jmx-service=172.19.0.10 \
+    -k my_keyspace \
+    -s dc1 \
+----
+
+JAR invocation
+[source=bash]
+----
+$ java -jar target/minotaur.jar {args}
+----
+
+## Cassandra version compatibility
+
+We have tested this against 3.11 and 4.0. Other versions should work ootb too as
+we are just talking via JMX.
+
+## Help
+
+[source=bash]
+----
+Usage: minotaur [-hV] [--jmx-client-auth] [--jmx-keystore=[STRING]]
+                [--jmx-keystore-password=[STRING]] [--jmx-password=[STRING]]
+                [--jmx-service=[ADDRESS][:PORT]|[JMX SERVICE URL]] [--jmx-truststore=[PATH]]
+                [--jmx-truststore-password=[PATH]] [--jmx-user=[STRING]]
+                [-k=<keyspaces>] -s=<sourceDC>
+Application for consistent rebuilding of a Cassandra cluster
+  -h, --help                Show this help message and exit.
+      --jmx-client-auth     boolean saying if c.s.m.j.ssl.need.client.auth should be set, defaults to false
+      --jmx-keystore=[STRING]
+                            Path to keystore file for Cassandra
+      --jmx-keystore-password=[STRING]
+                            Password to keystore file for Cassandra
+      --jmx-password=[STRING]
+                            Password for JMX for Cassandra
+      --jmx-service=[ADDRESS][:PORT]|[JMX SERVICE URL]
+                            Address (and optional port) of a Cassandra instance to connect to via JMX.
+ADDRESS may be a
+                              hostname, IPv4 dotted or decimal address, or IPv6 address. When ADDRESS
+                              is omitted, the loopback address is used. PORT, when specified, must
+                              be a valid port number. The default port 7199 will be substituted if
+                              omitted. Defaults to ':7199'
+      --jmx-truststore=[PATH]
+                            Path to truststore file for Cassandra
+      --jmx-truststore-password=[PATH]
+                            Password to truststore file for Cassandra
+      --jmx-user=[STRING]   User for JMX for Cassandra
+  -k, --keyspaces=<keyspaces>
+                            if no keyspace is specified, all keyspaces on non-local strategy will be rebuilt.
+  -s, --source-dc=<sourceDC>
+
+  -V, --version             Print version information and exit.
+----
+
+## Logging
+
+We are using logback. There is already embedded `logback.xml` in the built JAR however if you
+want to configure it, feel free to provide your own `logback.xml` and configure it like:
+
+----
+java -Dlogback.configurationFile=my-custom-logback.xml -jar minotaur.jar ...
+----
+
+You find the original file in `src/main/resources/logback.xml`.
