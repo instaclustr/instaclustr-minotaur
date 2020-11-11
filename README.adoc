@@ -1,9 +1,12 @@
 # Instaclustr Minotaur
 
+_Minotaur is a command line tool for consistent rebuilding of a Cassandra cluster._
+
 image:https://img.shields.io/maven-central/v/com.instaclustr/minotaur.svg?label=Maven%20Central[link=https://search.maven.org/search?q=g:%22com.instaclustr%22%20AND%20a:%22minotaur%22]
 image:https://circleci.com/gh/instaclustr/instaclustr-minotaur.svg?style=svg["Instaclustr",link="https://circleci.com/gh/instaclustr/instaclustr-minotaur"]
 
-Minotaur is a command line tool for consistent rebuild of a Cassandra cluster.
+- Website: https://www.instaclustr.com/
+- Documentation: [https://www.instaclustr.com/support/documentation/)
 
 ## Building
 
@@ -14,7 +17,7 @@ $ mvn clean install
 
 Artifacts are in `target`.
 
-We are providing:
+We provide:
 
 * Minotaur jar
 * rpm package
@@ -43,7 +46,7 @@ JAR invocation
 $ java -jar target/minotaur.jar {args}
 ----
 
-## Cassandra version compatibility
+## Cassandra Version Compatibility
 
 We have tested this against 3.11 and 4.0. Other versions should work ootb too as
 we are just talking via JMX.
@@ -87,11 +90,14 @@ ADDRESS may be a
 
 ## Logging
 
-We are using logback. There is already embedded `logback.xml` in the built JAR however if you
-want to configure it, feel free to provide your own `logback.xml` and configure it like:
+We are using logback. `logback.xml` is already embedded in the built JAR, however if you
+want to configure it feel free to provide your own `logback.xml` and configure it as follows:
 
 ----
 java -Dlogback.configurationFile=my-custom-logback.xml -jar minotaur.jar ...
 ----
 
-You find the original file in `src/main/resources/logback.xml`.
+You can find the original file in `src/main/resources/logback.xml`.
+
+## Further Information
+- Please see https://www.instaclustr.com/support/documentation/announcements/instaclustr-open-source-project-status/ for Instaclustr support status of this project
