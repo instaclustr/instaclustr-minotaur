@@ -5,8 +5,10 @@ _Minotaur is a command line tool for consistent rebuilding of a Cassandra cluste
 image:https://img.shields.io/maven-central/v/com.instaclustr/minotaur.svg?label=Maven%20Central[link=https://search.maven.org/search?q=g:%22com.instaclustr%22%20AND%20a:%22minotaur%22]
 image:https://circleci.com/gh/instaclustr/instaclustr-minotaur.svg?style=svg["Instaclustr",link="https://circleci.com/gh/instaclustr/instaclustr-minotaur"]
 
+image::Minotaur.png[Minotaur,width=50%]
+
 - Website: https://www.instaclustr.com/
-- Documentation: [https://www.instaclustr.com/support/documentation/)
+- Documentation: https://www.instaclustr.com/support/documentation/
 
 ## Building
 
