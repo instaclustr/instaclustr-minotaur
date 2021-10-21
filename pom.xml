@@ -5,7 +5,7 @@
     
     <groupId>com.instaclustr</groupId>
     <artifactId>minotaur</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     
     <name>Instaclustr Minotaur</name>
     <description>Tool for consistent rebuilding of a Cassandra cluster</description>
