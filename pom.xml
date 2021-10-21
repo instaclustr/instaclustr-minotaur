@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.instaclustr</groupId>
             <artifactId>commons</artifactId>
-            <version>1.4.0</version>
+            <version>1.4.8</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.kubernetes</groupId>

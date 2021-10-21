@@ -18,8 +18,10 @@ import com.instaclustr.picocli.CLIApplication;
 import com.instaclustr.picocli.CassandraJMXSpec;
 import jmx.org.apache.cassandra.CassandraJMXConnectionInfo;
 import jmx.org.apache.cassandra.CassandraObjectNames.V3;
+import jmx.org.apache.cassandra.CassandraObjectNames.V2;
 import jmx.org.apache.cassandra.service.CassandraJMXService;
 import jmx.org.apache.cassandra.service.CassandraJMXServiceImpl;
+import jmx.org.apache.cassandra.service.cassandra2.Cassandra2EndpointSnitchInfoMBean;
 import jmx.org.apache.cassandra.service.cassandra3.EndpointSnitchInfoMBean;
 import jmx.org.apache.cassandra.service.cassandra3.StorageServiceMBean;
 import org.awaitility.Awaitility;
@@ -31,11 +33,11 @@ import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 @Command(
-    versionProvider = Minotaur.class,
-    name = "minotaur",
-    usageHelpWidth = 128,
-    description = "Application for consistent rebuilding of a Cassandra cluster",
-    mixinStandardHelpOptions = true
+        versionProvider = Minotaur.class,
+        name = "minotaur",
+        usageHelpWidth = 128,
+        description = "Application for consistent rebuilding of a Cassandra cluster",
+        mixinStandardHelpOptions = true
 )
 public class Minotaur extends CLIApplication implements Runnable {
 
@@ -87,8 +89,10 @@ public class Minotaur extends CLIApplication implements Runnable {
             System.exit(1);
         }
 
+        final String endpoint = getEndpoint();
+
         for (final String keyspace : keyspaces) {
-            if (rebuild(getEndpoint(), getDatacenter(), describeRing(keyspace), keyspace) != 0) {
+            if (rebuild(endpoint, getDatacenter(endpoint), describeRing(keyspace), keyspace) != 0) {
                 System.exit(1);
             }
         }
@@ -111,6 +115,26 @@ public class Minotaur extends CLIApplication implements Runnable {
                 logger.error("Unable to get a list of non-local strategy keyspaces!", ex);
                 throw new IllegalStateException();
             }
+        }
+    }
+
+    /**
+     * Returns version of Cassandra node Minotaur connects to. We are fetching this via means of storage mbean
+     * for Cassandra 3, it does not matter too much as that method is present in every mbean for each respective
+     * major Cassandra version.
+     *
+     * @return version of a Cassandra node Minotaur connects to
+     */
+    private String getCassandraVersion() {
+        try {
+            return jmxService.doWithCassandra3StorageServiceMBean(new FunctionWithEx<StorageServiceMBean, String>() {
+                @Override
+                public String apply(StorageServiceMBean storageServiceMBean) {
+                    return storageServiceMBean.getReleaseVersion();
+                }
+            });
+        } catch (final Exception ex) {
+            throw new RuntimeException("Unable to determine Cassandra version!", ex);
         }
     }
 
@@ -151,16 +175,30 @@ public class Minotaur extends CLIApplication implements Runnable {
         }
     }
 
-    private String getDatacenter() {
-        try {
-            return jmxService.doWithMBean(new FunctionWithEx<EndpointSnitchInfoMBean, String>() {
-                @Override
-                public String apply(final EndpointSnitchInfoMBean object) {
-                    return object.getDatacenter();
-                }
-            }, EndpointSnitchInfoMBean.class, V3.ENDPOINT_SNITCH_INFO_MBEAN_NAME);
-        } catch (final Exception ex) {
-            throw new IllegalStateException("Unable to get datacenter!", ex);
+    private String getDatacenter(String endpoint) {
+        final String cassandraVersion = getCassandraVersion();
+        if (cassandraVersion.startsWith("2")) {
+            try {
+                return jmxService.doWithMBean(new FunctionWithEx<Cassandra2EndpointSnitchInfoMBean, String>() {
+                    @Override
+                    public String apply(final Cassandra2EndpointSnitchInfoMBean object) throws Exception {
+                        return object.getDatacenter(endpoint);
+                    }
+                }, Cassandra2EndpointSnitchInfoMBean.class, V2.ENDPOINT_SNITCH_INFO_MBEAN_NAME);
+            } catch (final Exception ex) {
+                throw new IllegalStateException("Unable to get datacenter!", ex);
+            }
+        } else {
+            try {
+                return jmxService.doWithMBean(new FunctionWithEx<EndpointSnitchInfoMBean, String>() {
+                    @Override
+                    public String apply(final EndpointSnitchInfoMBean object) {
+                        return object.getDatacenter();
+                    }
+                }, EndpointSnitchInfoMBean.class, V3.ENDPOINT_SNITCH_INFO_MBEAN_NAME);
+            } catch (final Exception ex) {
+                throw new IllegalStateException("Unable to get datacenter!", ex);
+            }
         }
     }
 
