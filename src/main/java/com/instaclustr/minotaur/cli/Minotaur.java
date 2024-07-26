@@ -160,7 +160,7 @@ public class Minotaur extends CLIApplication implements Runnable {
 
                         logger.debug(String.format("Rebuilding keyspace %s from Host: %s, Tokens: %s", keyspace, rebuildPlan.getSource(), tokens));
 
-                        probe.rebuild(sourceDC, keyspace, tokens, rebuildPlan.getSource());
+                        probe.rebuild(null, keyspace, tokens, rebuildPlan.getSource());
                     }
                     logger.info("Rebuild of keyspace {} finished", keyspace);
 
